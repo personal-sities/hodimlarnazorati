@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xodimlar Kunlik Rejasi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f5f5f0;color:#1a1a1a;padding:24px;min-height:100vh}
+.wrap{max-width:780px;margin:0 auto}
+h1{font-size:20px;font-weight:700;margin-bottom:20px;color:#1a1a1a}
+.emp-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.etab{padding:6px 16px;border-radius:999px;border:1px solid #d0d0c8;font-size:13px;cursor:pointer;background:#fff;color:#666;transition:all .15s;font-family:inherit}
+.etab.on{font-weight:500;color:#fff}
+.top-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.mnav{display:flex;align-items:center;gap:6px}
+.mnav button{padding:5px 12px;font-size:15px;border:1px solid #d0d0c8;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;color:#1a1a1a}
+.mnav button:hover{background:#f0f0ea}
+.mlabel{font-size:15px;font-weight:600;min-width:150px;text-align:center;color:#1a1a1a}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #e8e8e0}
+.stat-lbl{font-size:11px;color:#888;margin-bottom:2px}
+.stat-val{font-size:20px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:18px}
+.dname{font-size:11px;font-weight:500;color:#888;text-align:center;padding:3px 0;text-transform:uppercase;letter-spacing:.04em}
+.dcell{border:1px solid #e8e8e0;border-radius:8px;padding:5px 6px;cursor:pointer;background:#fff;min-height:54px;transition:border-color .12s}
+.dcell:hover{border-color:#aaa}
+.dcell.empty{background:transparent;border-color:transparent;cursor:default}
+.dcell.today{border-color:#378ADD;border-width:1.5px}
+.dcell.sel{border-width:2px;background:#f0f6ff}
+.dnum{font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:3px}
+.dcell.today .dnum{color:#185FA5}
+.dot-row{display:flex;gap:2px;flex-wrap:wrap}
+.dot{width:5px;height:5px;border-radius:50%}
+.dl{background:#378ADD}.dt{background:#1D9E75}
+.panel{background:#fff;border:1px solid #e8e8e0;border-radius:12px;padding:16px 18px}
+.ph{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0}
+.pname{font-size:14px;font-weight:600;color:#1a1a1a}
+.pdate{font-size:12px;color:#888;margin-top:1px}
+.slbl{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px;display:flex;align-items:center;gap:5px}
+.arow{display:flex;gap:6px;margin-bottom:8px}
+.arow input{flex:1;font-size:13px;padding:7px 10px;border:1px solid #d0d0c8;border-radius:8px;font-family:inherit;outline:none;color:#1a1a1a;background:#fff}
+.arow input:focus{border-color:#378ADD}
+.arow button{font-size:20px;padding:0 14px;border:1px solid #d0d0c8;border-radius:8px;background:#fff;cursor:pointer;color:#1a1a1a;line-height:1}
+.arow button:hover{background:#f0f0ea}
+.ilist{display:flex;flex-direction:column;gap:6px}
+.icard{border:1px solid #e8e8e0;border-radius:10px;background:#fafaf8;overflow:hidden;transition:opacity .2s}
+.icard.done-card{opacity:.75;background:#f4faf0}
+.itop{display:flex;align-items:center;gap:8px;padding:9px 12px}
+.ichk{width:17px;height:17px;cursor:pointer;flex-shrink:0;accent-color:#1D9E75}
+.itxt{font-size:13px;color:#1a1a1a;flex:1;font-weight:500}
+.itxt.done{text-decoration:line-through;color:#bbb}
+.ibadge{font-size:11px;padding:2px 8px;border-radius:999px;flex-shrink:0;font-weight:500}
+.b-done{background:#EAF3DE;color:#27500A}
+.b-pend{background:#f0f0ea;color:#888}
+.ibtn{background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;line-height:1;padding:0 3px;font-family:inherit}
+.ibtn:hover{color:#E24B4A}
+
+/* Done stamp */
+.done-stamp{font-size:10px;color:#1D9E75;font-weight:600;padding:2px 8px;background:#EAF3DE;border-radius:999px;margin-left:4px;white-space:nowrap}
+
+/* Note area — always visible */
+.ifooter{border-top:1px solid #f0f0ea;padding:8px 12px;background:#fff;display:flex;align-items:flex-start;gap:6px}
+.fb-icon{color:#c0c0b8;font-size:13px;margin-top:3px;flex-shrink:0}
+.note-label{font-size:10px;color:#bbb;margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.note-wrap{flex:1}
+.ifooter textarea{width:100%;font-size:12px;border:1px solid #e8e8e0;border-radius:6px;background:#fafaf8;resize:none;outline:none;color:#555;font-family:inherit;line-height:1.5;min-height:36px;padding:5px 8px;transition:border-color .12s}
+.ifooter textarea:focus{border-color:#378ADD;background:#fff}
+.ifooter textarea::placeholder{color:#ccc}
+
+.prog-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.prog-bg{flex:1;height:4px;background:#e8e8e0;border-radius:99px}
+.prog-fill{height:4px;border-radius:99px;transition:width .3s}
+.prog-txt{font-size:11px;color:#888;min-width:30px;text-align:right}
+.divider{border:none;border-top:1px solid #f0f0ea;margin:14px 0}
+.nosel{text-align:center;padding:32px 0;color:#bbb;font-size:13px}
+.save-indicator{position:fixed;bottom:16px;right:16px;background:#1D9E75;color:#fff;font-size:12px;padding:6px 14px;border-radius:999px;opacity:0;transition:opacity .3s;font-family:inherit;pointer-events:none}
+.save-indicator.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Xodimlar kunlik rejasi</h1>
+  <div class="emp-tabs" id="empTabs"></div>
+  <div class="top-bar">
+    <div class="mnav">
+      <button onclick="chM(-1)">&#8249;</button>
+      <span class="mlabel" id="mlabel"></span>
+      <button onclick="chM(1)">&#8250;</button>
+    </div>
+  </div>
+  <div class="stat-row" id="statRow"></div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div id="panel"></div>
+</div>
+<div class="save-indicator" id="saveInd">✓ Saqlandi</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const EMP=["Isfandiyor","Xusanxon","Jonibek","Sabina","Sunnatillo"];
+const AV=[{bg:"#E6F1FB",c:"#0C447C",a:"#378ADD"},{bg:"#EAF3DE",c:"#27500A",a:"#3B6D11"},{bg:"#FAEEDA",c:"#633806",a:"#BA7517"},{bg:"#FBEAF0",c:"#72243E",a:"#D4537E"},{bg:"#E1F5EE",c:"#085041",a:"#1D9E75"}];
+const DAYS=["Du","Se","Ch","Pa","Ju","Sh","Ya"];
+const MONTHS=["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
+const DNAMES=["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
+const SUPABASE_URL="https://cxppgamhvesbcezrzvmp.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_-jye-o0sb1j37EiGOkSqJQ_C-v0hwYh";
+const SUPABASE_TABLE="employee_daily_plans";
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+let cE=0,now=new Date(),cY=now.getFullYear(),cM=now.getMonth(),sel=null,store={};
+
+function key(e,y,m,d){return "emp"+e+"_"+y+"_"+m+"_"+d}
+function gd(e,y,m,d){const k=key(e,y,m,d);if(!store[k])store[k]={locs:[],tasks:[]};return store[k]}
+function planDate(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
+function emptyDay(){return {locs:[],tasks:[]}}
+function normalizeDay(data){
+  return {
+    locs:Array.isArray(data?.locs)?data.locs:[],
+    tasks:Array.isArray(data?.tasks)?data.tasks:[]
+  };
+}
+
+// --- Persistent storage (Supabase) ---
+let saveTimer=null;
+async function sv(e,y,m,d){
+  const k=key(e,y,m,d);
+  const data=normalizeDay(store[k]);
+  if(!data)return;
+  try{
+    const payload={
+      employee_name:EMP[e],
+      employee_index:e,
+      plan_date:planDate(y,m,d),
+      locs:data.locs,
+      tasks:data.tasks,
+      updated_at:new Date().toISOString()
+    };
+    const {error}=await supabase.from(SUPABASE_TABLE).upsert(payload,{onConflict:"employee_name,plan_date"});
+    if(error)throw error;
+    store[k]=data;
+    showSaveInd();
+  }catch(err){
+    // fallback to in-memory only
+    console.warn("Supabase save failed:",err);
+  }
+}
+
+async function ld(e,y,m,d){
+  const k=key(e,y,m,d);
+  if(store[k])return; // already loaded
+  try{
+    const {data,error}=await supabase
+      .from(SUPABASE_TABLE)
+      .select("locs,tasks")
+      .eq("employee_name",EMP[e])
+      .eq("plan_date",planDate(y,m,d))
+      .maybeSingle();
+    if(error)throw error;
+    if(data)store[k]=normalizeDay(data);
+  }catch(err){
+    // key doesn't exist yet, ignore
+    console.warn("Supabase load failed:",err);
+  }
+  if(!store[k])store[k]=emptyDay();
+}
+
+let saveIndTimer=null;
+function showSaveInd(){
+  const el=document.getElementById("saveInd");
+  el.classList.add("show");
+  clearTimeout(saveIndTimer);
+  saveIndTimer=setTimeout(()=>el.classList.remove("show"),1500);
+}
+
+function chM(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}sel=null;render()}
+
+function rTabs(){
+  const el=document.getElementById("empTabs");el.innerHTML="";
+  EMP.forEach((n,i)=>{
+    const b=document.createElement("button");
+    b.className="etab"+(i===cE?" on":"");
+    if(i===cE){b.style.background=AV[i].a;b.style.borderColor=AV[i].a}
+    b.textContent=n;b.onclick=()=>{cE=i;sel=null;render()};
+    el.appendChild(b);
+  });
+}
+
+function getDays(y,m){return new Date(y,m+1,0).getDate()}
+function getFirst(y,m){let d=new Date(y,m,1).getDay();return d===0?6:d-1}
+
+async function rCal(){
+  document.getElementById("mlabel").textContent=MONTHS[cM]+" "+cY;
+  const g=document.getElementById("calGrid");g.innerHTML="";
+  DAYS.forEach(d=>{const e=document.createElement("div");e.className="dname";e.textContent=d;g.appendChild(e)});
+  const first=getFirst(cY,cM),total=getDays(cY,cM);
+  const td=now.getDate(),tm=now.getMonth(),ty=now.getFullYear();
+  
+  // Load all days in parallel
+  const loads=[];
+  for(let d=1;d<=total;d++) loads.push(ld(cE,cY,cM,d));
+  await Promise.all(loads);
+  
+  for(let i=0;i<first;i++){const e=document.createElement("div");e.className="dcell empty";g.appendChild(e)}
+  for(let d=1;d<=total;d++){
+    const dt=gd(cE,cY,cM,d);
+    const isT=d===td&&cM===tm&&cY===ty,isS=d===sel;
+    const cell=document.createElement("div");
+    cell.className="dcell"+(isT?" today":"")+(isS?" sel":"");
+    if(isS)cell.style.borderColor=AV[cE].a;
+    const num=document.createElement("div");num.className="dnum";num.textContent=d;cell.appendChild(num);
+    const dots=document.createElement("div");dots.className="dot-row";
+    for(let x=0;x<Math.min(dt.locs.length,3);x++){const dot=document.createElement("div");dot.className="dot dl";dots.appendChild(dot)}
+    for(let x=0;x<Math.min(dt.tasks.length,3);x++){const dot=document.createElement("div");dot.className="dot dt";dots.appendChild(dot)}
+    cell.appendChild(dots);
+    cell.onclick=()=>{sel=d;rCal();rStats();rPanel()};
+    g.appendChild(cell);
+  }
+}
+
+async function rStats(){
+  const el=document.getElementById("statRow");
+  const total=getDays(cY,cM);
+  const loads=[];
+  for(let d=1;d<=total;d++) loads.push(ld(cE,cY,cM,d));
+  await Promise.all(loads);
+  let tL=0,tT=0,dL=0,dT=0;
+  for(let d=1;d<=total;d++){const dt=gd(cE,cY,cM,d);tL+=dt.locs.length;tT+=dt.tasks.length;dL+=dt.locs.filter(x=>x.done).length;dT+=dt.tasks.filter(x=>x.done).length}
+  const av=AV[cE];
+  el.innerHTML=`
+    <div class="stat"><div class="stat-lbl">Joylar</div><div class="stat-val" style="color:${av.a}">${tL}</div></div>
+    <div class="stat"><div class="stat-lbl">Bajarilgan joy</div><div class="stat-val" style="color:#1D9E75">${dL}</div></div>
+    <div class="stat"><div class="stat-lbl">Vazifalar</div><div class="stat-val">${tT}</div></div>
+    <div class="stat"><div class="stat-lbl">Bajarilgan vazifa</div><div class="stat-val" style="color:#1D9E75">${dT}</div></div>`;
+}
+
+async function rPanel(){
+  const el=document.getElementById("panel");
+  if(!sel){el.innerHTML='<div class="nosel">Kunni tanlang</div>';return}
+  await ld(cE,cY,cM,sel);
+  const dt=gd(cE,cY,cM,sel);
+  const av=AV[cE];
+  const init=EMP[cE].slice(0,2).toUpperCase();
+  const dow=new Date(cY,cM,sel).getDay();
+  const lD=dt.locs.filter(x=>x.done).length,tD=dt.tasks.filter(x=>x.done).length;
+
+  el.innerHTML=`
+  <div class="panel">
+    <div class="ph">
+      <div class="av" style="background:${av.bg};color:${av.c}">${init}</div>
+      <div><div class="pname">${EMP[cE]}</div><div class="pdate">${DNAMES[dow]}, ${sel} ${MONTHS[cM]} ${cY}</div></div>
+    </div>
+    <div class="slbl">📍 Boradigan joylar</div>
+    <div class="arow">
+      <input type="text" id="lInp" placeholder="Joy yoki manzil..." onkeydown="if(event.key==='Enter')add('loc')" />
+      <button onclick="add('loc')">+</button>
+    </div>
+    <div class="ilist" id="lList"></div>
+    ${dt.locs.length>0?`<div class="prog-row"><div class="prog-bg"><div class="prog-fill" style="width:${Math.round(lD/dt.locs.length*100)}%;background:${av.a}"></div></div><span class="prog-txt">${lD}/${dt.locs.length}</span></div>`:""}
+    <div class="divider"></div>
+    <div class="slbl">✓ Kunlik vazifalar</div>
+    <div class="arow">
+      <input type="text" id="tInp" placeholder="Vazifa..." onkeydown="if(event.key==='Enter')add('task')" />
+      <button onclick="add('task')">+</button>
+    </div>
+    <div class="ilist" id="tList"></div>
+    ${dt.tasks.length>0?`<div class="prog-row"><div class="prog-bg"><div class="prog-fill" style="width:${Math.round(tD/dt.tasks.length*100)}%;background:#1D9E75"></div></div><span class="prog-txt">${tD}/${dt.tasks.length}</span></div>`:""}
+  </div>`;
+  rItems("lList",dt.locs,"loc");
+  rItems("tList",dt.tasks,"task");
+}
+
+function formatTime(ts){
+  if(!ts)return"";
+  const d=new Date(ts);
+  return d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");
+}
+
+function rItems(cid,arr,type){
+  const el=document.getElementById(cid);if(!el)return;
+  if(!arr.length){el.innerHTML='<div style="font-size:12px;color:#bbb;padding:6px 0">Hali hech narsa qo\'shilmagan</div>';return}
+  el.innerHTML="";
+  arr.forEach((item,i)=>{
+    const card=document.createElement("div");
+    card.className="icard"+(item.done?" done-card":"");
+    
+    const doneStamp=item.done && item.doneAt
+      ? `<span class="done-stamp">✓ ${formatTime(item.doneAt)} da bajarildi</span>`
+      : "";
+
+    card.innerHTML=`
+      <div class="itop">
+        <input type="checkbox" class="ichk" ${item.done?"checked":""} onchange="toggle('${type}',${i})" />
+        <span class="itxt${item.done?" done":""}">${item.text}</span>
+        ${doneStamp}
+        <span class="ibadge ${item.done?"b-done":"b-pend"}">${item.done?"✓ Bajarildi":"Kutilmoqda"}</span>
+        <button class="ibtn" onclick="del('${type}',${i})" title="O'chirish">✕</button>
+      </div>
+      <div class="ifooter">
+        <span class="fb-icon">💬</span>
+        <div class="note-wrap">
+          <div class="note-label">Izoh / Feedback</div>
+          <textarea rows="2" placeholder="Bu joy / vazifa haqida izoh yozing..." onchange="setNote('${type}',${i},this.value)" oninput="autoResize(this)">${item.note||""}</textarea>
+        </div>
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+function autoResize(el){el.style.height="auto";el.style.height=el.scrollHeight+"px"}
+
+async function add(type){
+  const inp=document.getElementById(type==="loc"?"lInp":"tInp");
+  const val=inp.value.trim();if(!val||!sel)return;
+  const dt=gd(cE,cY,cM,sel);
+  if(type==="loc")dt.locs.push({text:val,done:false,note:"",doneAt:null});
+  else dt.tasks.push({text:val,done:false,note:"",doneAt:null});
+  await sv(cE,cY,cM,sel);
+  inp.value="";rPanel();rCal();rStats();
+}
+
+async function toggle(type,idx){
+  if(!sel)return;
+  const dt=gd(cE,cY,cM,sel);
+  const arr=type==="loc"?dt.locs:dt.tasks;
+  arr[idx].done=!arr[idx].done;
+  arr[idx].doneAt=arr[idx].done?Date.now():null;
+  await sv(cE,cY,cM,sel);rPanel();rCal();rStats();
+}
+
+async function del(type,idx){
+  if(!sel)return;
+  const dt=gd(cE,cY,cM,sel);
+  const arr=type==="loc"?dt.locs:dt.tasks;
+  arr.splice(idx,1);
+  await sv(cE,cY,cM,sel);rPanel();rCal();rStats();
+}
+
+async function setNote(type,idx,val){
+  if(!sel)return;
+  const dt=gd(cE,cY,cM,sel);
+  const arr=type==="loc"?dt.locs:dt.tasks;
+  arr[idx].note=val;
+  await sv(cE,cY,cM,sel);
+}
+
+async function render(){
+  rTabs();
+  await rStats();
+  await rCal();
+  await rPanel();
+}
+render();
+</script>
+</body>
+</html>
